@@ -62,33 +62,31 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: TextField(
                     controller: nameController1,
                     decoration: const InputDecoration(
-                        fillColor: Colors.red,
+                        fillColor: Color.fromARGB(221, 255, 233, 233),
                         filled: true,
                         border: OutlineInputBorder(),
-                        labelText: "Reminder", 
-                        labelStyle: TextStyle(color: Colors.yellow)))
-                        ),
+                        labelText: "Reminder",
+                        labelStyle: TextStyle(color: Colors.black)))),
             Padding(
                 padding: const EdgeInsets.all(20),
                 child: TextField(
                     controller: nameController2,
                     decoration: const InputDecoration(
-                        fillColor: Colors.redAccent,
+                        fillColor: Color.fromARGB(221, 255, 233, 233),
                         filled: true,
                         border: OutlineInputBorder(),
                         labelText: "Date",
-                        labelStyle: TextStyle(color: Colors.yellow))
-                        )),
+                        labelStyle: TextStyle(color: Colors.black)))),
             Padding(
                 padding: const EdgeInsets.all(20),
                 child: TextField(
                     controller: nameController3,
                     decoration: const InputDecoration(
-                        fillColor: Colors.deepPurpleAccent,
+                        fillColor: Color.fromARGB(221, 255, 233, 233),
                         filled: true,
                         border: OutlineInputBorder(),
                         labelText: "Time",
-                        labelStyle: TextStyle(color: Colors.yellow)))),
+                        labelStyle: TextStyle(color: Colors.black)))),
             ElevatedButton(
                 onPressed: _addItem, child: const Text("Add Reminder")),
             Expanded(
@@ -108,9 +106,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Container(
                             height: 50,
                             margin: const EdgeInsets.all(2),
-                            color: Color.fromARGB(255, 1, 67, 27),
+                            color: Color.fromARGB(221, 255, 233, 233),
                             child: Text(
-                                style: const TextStyle(fontSize: 25, color: Colors.yellowAccent),
+                                style: const TextStyle(
+                                    fontSize: 25, color: Color.fromARGB(255, 0, 0, 0)),
                                 '${reminders.elementAt(index)} : ${date.elementAt(index)} : ${time.elementAt(index)}',
                                 textAlign: TextAlign.center)),
                       );
@@ -162,7 +161,7 @@ class _SecondRoute extends State<SecondRoute> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 129, 9, 2),
+        backgroundColor: const Color.fromARGB(255, 129, 9, 2),
         appBar: AppBar(
           title: const Text("Changes"),
         ),
@@ -171,8 +170,13 @@ class _SecondRoute extends State<SecondRoute> {
             Padding(
                 padding: const EdgeInsets.all(20),
                 child: reminders.isEmpty
-                    ? const Text("Nothing to see here", style: TextStyle(fontSize: 25, color: Colors.deepOrangeAccent))
-                    : Text(style: const TextStyle(fontSize: 25, color: Colors.deepPurple), '${reminders.elementAt(widget.index)} : ${date.elementAt(widget.index)} : ${time.elementAt(widget.index)}')),
+                    ? const Text("Nothing to see here",
+                        style: TextStyle(
+                            fontSize: 25, color: Colors.deepOrangeAccent))
+                    : Text(
+                        style: const TextStyle(
+                            fontSize: 25, color: Colors.deepPurple),
+                        '${reminders.elementAt(widget.index)} : ${date.elementAt(widget.index)} : ${time.elementAt(widget.index)}')),
             Padding(
                 padding: const EdgeInsets.all(20),
                 child: ElevatedButton(
@@ -180,16 +184,18 @@ class _SecondRoute extends State<SecondRoute> {
                     _removeItem(widget.index);
                     Navigator.pop(context);
                   },
-                  child: const Text(style: TextStyle(color: Colors.deepPurple), 'Remove this Todo'),
+                  child: const Text(
+                      style: TextStyle(color: Colors.deepPurple),
+                      'Remove this Todo'),
                 )),
             Padding(
               padding: const EdgeInsets.all(20),
               child: TextField(
                   controller: nameController1,
                   decoration: const InputDecoration(
-                        fillColor: Colors.red,
-                        filled: true,
-                        border: OutlineInputBorder(),
+                    fillColor: Colors.red,
+                    filled: true,
+                    border: OutlineInputBorder(),
                     labelText: 'Edit the name',
                   )),
             ),
@@ -201,10 +207,10 @@ class _SecondRoute extends State<SecondRoute> {
               child: TextField(
                   controller: nameController2,
                   decoration: const InputDecoration(
-                        fillColor: Colors.redAccent,
-                        filled: true,
-                        border: OutlineInputBorder(),
-                        labelText: 'Edit the date',
+                    fillColor: Colors.redAccent,
+                    filled: true,
+                    border: OutlineInputBorder(),
+                    labelText: 'Edit the date',
                   )),
             ),
             ElevatedButton(
@@ -215,9 +221,9 @@ class _SecondRoute extends State<SecondRoute> {
               child: TextField(
                   controller: nameController3,
                   decoration: const InputDecoration(
-                        fillColor: Colors.deepPurpleAccent,
-                        filled: true,
-                        border: OutlineInputBorder(),
+                    fillColor: Colors.deepPurpleAccent,
+                    filled: true,
+                    border: OutlineInputBorder(),
                     labelText: 'Edit the time',
                   )),
             ),
