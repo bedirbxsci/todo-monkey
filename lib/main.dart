@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
           secondary: const Color.fromARGB(0, 6, 250, 177),
         ),
       ),
-      home: const MyHomePage(title: 'Add, Delete, or Edit Tasks, You Lazy Bum'),
+      home: const MyHomePage(title: 'Add, Delete, or Edit Tasks'),
     );
   }
 }
@@ -37,20 +38,101 @@ List<String> date = [];
 List<String> time = [];
 
 class _MyHomePageState extends State<MyHomePage> {
+  DateTime selectedDate = DateTime.now();
+  TimeOfDay selectedTime = TimeOfDay.now();
+  DateTime dateTime = DateTime.now();
+
+  // Select for Date
+  Future<DateTime> _selectDate(BuildContext context) async {
+    final selected = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2025),
+        builder: (context, child) {
+          return Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: const ColorScheme.light(
+                primary: Colors.lightBlueAccent, // <-- SEE HERE
+                onPrimary: Colors.white, // <-- SEE HERE
+                onSurface: Colors.black, // <-- SEE HERE
+              ),
+              textButtonTheme: TextButtonThemeData(
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.black, // button text color
+                ),
+              ),
+            ),
+            child: child!,
+          );
+        });
+    if (selected != null && selected != selectedDate) {
+      setState(() {
+        selectedDate = selected;
+      });
+    }
+    return selectedDate;
+  }
+
+// Select for Time
+  Future<TimeOfDay> _selectTime(BuildContext context) async {
+    final selected = await showTimePicker(
+      context: context,
+      initialTime: selectedTime,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Colors.lightBlueAccent, // <-- SEE HERE
+              onPrimary: Colors.white, // <-- SEE HERE
+              onSurface: Colors.black, // <-- SEE HERE
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // button text color
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (selected != null && selected != selectedTime) {
+      setState(() {
+        selectedTime = selected;
+      });
+    }
+    return selectedTime;
+  }
+
+  String getDate() {
+    // ignore: unnecessary_null_comparison
+    if (selectedDate == null) {
+      return 'select date';
+    } else {
+      return DateFormat('MMM d, yyyy').format(selectedDate);
+    }
+  }
+
+  String getTime(TimeOfDay tod) {
+    final now = DateTime.now();
+
+    final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
+    final format = DateFormat.jm();
+    return format.format(dt);
+  }
+
   TextEditingController nameController1 = TextEditingController();
   TextEditingController nameController2 = TextEditingController();
-  TextEditingController nameController3 = TextEditingController();
-  TextEditingController nameController4 = TextEditingController();
+
   void _addItem() {
     setState(() {
       reminders.insert(0, nameController1.text);
       details.insert(0, nameController2.text);
-      date.insert(0, nameController3.text);
-      time.insert(0, nameController4.text);
+      date.insert(0, getDate());
+      time.insert(0, getTime(selectedTime));
       nameController1.clear();
       nameController2.clear();
-      nameController3.clear();
-      nameController4.clear();
     });
   }
 
@@ -65,48 +147,84 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 129, 9, 2),
+        backgroundColor: Colors.lightBlueAccent,
         appBar: AppBar(
           title: Text(widget.title),
         ),
-        body: Column(children: <Widget>[
-          Expanded(
-              child: ListView.builder(
-                  padding: const EdgeInsets.all(8),
-                  itemCount: reminders.length,
-                  itemBuilder: (BuildContext context, index) {
-                    return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: ((context) =>
-                                    SecondRoute(index: index))),
-                          ).then((value) => setState(() {}));
-                        },
-                        child: Card(
-                          color: Colors.white,
-                          elevation: 10.0,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0)),
-                          child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Row(children: <Widget>[
-                                Expanded(
-                                    child: Text(
-                                  style: const TextStyle(
-                                      fontSize: 25,
-                                      color: Color.fromARGB(255, 0, 0, 0)),
-                                  '${reminders.elementAt(index)} : ${date.elementAt(index)} : ${time.elementAt(index)}',
-                                )),
-                                IconButton(
-                                    onPressed: () => _removeItem(index),
-                                    icon: const Icon(Icons.delete)),
-                              ])),
-                              
-                        ));
-                  }))
-        ]),
+        body: reminders.isEmpty
+            ? const Center(
+                child: Text(
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                    'You have no Tasks to do RIGHT NOW'))
+            : Column(children: <Widget>[
+                Expanded(
+                    child: ListView.builder(
+                        padding: const EdgeInsets.all(8),
+                        itemCount: reminders.length,
+                        itemBuilder: (BuildContext context, index) {
+                          return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: ((context) =>
+                                          SecondRoute(index: index))),
+                                ).then((value) => setState(() {}));
+                              },
+                              child: Card(
+                                color: Colors.white,
+                                elevation: 10.0,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0)),
+                                child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Row(children: <Widget>[
+                                      const Icon(
+                                        Icons.list,
+                                        color: Colors.black,
+                                      ),
+                                      Expanded(
+                                          child: ListTile(
+                                              title: Text(
+                                                style: const TextStyle(
+                                                    fontSize: 20,
+                                                    color: Color.fromARGB(
+                                                        255, 0, 0, 0)),
+                                                reminders.elementAt(index),
+                                              ),
+                                              subtitle: Text(
+                                                  details.elementAt(index)),
+                                              trailing: const Icon(
+                                                Icons.event,
+                                                color: Colors.black,
+                                              ))),
+                                      Expanded(
+                                          child: ListTile(
+                                        title: Text(
+                                          style: const TextStyle(
+                                              fontSize: 18,
+                                              color:
+                                                  Color.fromARGB(255, 0, 0, 0)),
+                                          date.elementAt(index),
+                                        ),
+                                        subtitle: Text(
+                                          style: const TextStyle(
+                                              fontSize: 18,
+                                              color:
+                                                  Color.fromARGB(255, 0, 0, 0)),
+                                          time.elementAt(index),
+                                        ),
+                                      )),
+                                      IconButton(
+                                          onPressed: () => _removeItem(index),
+                                          icon: const Icon(
+                                            Icons.delete,
+                                            color: Colors.red,
+                                          )),
+                                    ])),
+                              ));
+                        }))
+              ]),
         floatingActionButton: FloatingActionButton(
             onPressed: () => _displayDialog(context),
             tooltip: 'Add Item',
@@ -121,7 +239,7 @@ class _MyHomePageState extends State<MyHomePage> {
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(32.0))),
             insetPadding: const EdgeInsets.all(20),
-            backgroundColor: const Color.fromARGB(221, 255, 233, 233),
+            backgroundColor: const Color.fromARGB(255, 134, 212, 251),
             title: const Text(
                 textAlign: TextAlign.center,
                 'Add a task and focus yourself so you do not end like Benjamin Chong'),
@@ -131,7 +249,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: TextField(
                       controller: nameController1,
                       decoration: const InputDecoration(
-                          fillColor: Color.fromARGB(221, 255, 233, 233),
+                          fillColor: Colors.white,
                           filled: true,
                           border: OutlineInputBorder(),
                           labelText: "Task Name",
@@ -143,7 +261,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           controller: nameController2,
                           maxLines: 30,
                           decoration: const InputDecoration(
-                              fillColor: Color.fromARGB(221, 255, 233, 233),
+                              fillColor: Colors.white,
                               filled: true,
                               border: OutlineInputBorder(),
                               labelText: "Task Detail",
@@ -151,23 +269,21 @@ class _MyHomePageState extends State<MyHomePage> {
               Row(
                 children: [
                   Expanded(
-                      child: TextField(
-                          controller: nameController3,
-                          decoration: const InputDecoration(
-                              fillColor: Color.fromARGB(221, 255, 233, 233),
-                              filled: true,
-                              border: OutlineInputBorder(),
-                              labelText: "Date",
-                              labelStyle: TextStyle(color: Colors.black)))),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _selectDate(context);
+                      },
+                      child: const Text('Date Picker'),
+                    ),
+                  ),
                   Expanded(
-                      child: TextField(
-                          controller: nameController4,
-                          decoration: const InputDecoration(
-                              fillColor: Color.fromARGB(221, 255, 233, 233),
-                              filled: true,
-                              border: OutlineInputBorder(),
-                              labelText: "Time",
-                              labelStyle: TextStyle(color: Colors.black))))
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _selectTime(context);
+                      },
+                      child: const Text('Time Picker'),
+                    ),
+                  ),
                 ],
               )
             ]),
@@ -175,7 +291,7 @@ class _MyHomePageState extends State<MyHomePage> {
               // add button
               TextButton(
                 style: TextButton.styleFrom(
-                  foregroundColor: const Color.fromARGB(255, 254, 0, 85),
+                  foregroundColor: Colors.white,
                 ),
                 child: const Text('ADD'),
                 onPressed: () {
@@ -188,15 +304,13 @@ class _MyHomePageState extends State<MyHomePage> {
               // Cancel button
               TextButton(
                 style: TextButton.styleFrom(
-                  foregroundColor: const Color.fromARGB(255, 254, 0, 85),
+                  foregroundColor: Colors.white,
                 ),
                 child: const Text('CANCEL'),
                 onPressed: () {
                   Navigator.of(context).pop();
                   nameController1.clear();
                   nameController2.clear();
-                  nameController3.clear();
-                  nameController4.clear();
                 },
               )
             ],
@@ -214,10 +328,93 @@ class SecondRoute extends StatefulWidget {
 }
 
 class _SecondRoute extends State<SecondRoute> {
+  DateTime selectedDate = DateTime.now();
+  TimeOfDay selectedTime = TimeOfDay.now();
+
+  // Select for Date
+  Future<DateTime> _selectDate(BuildContext context) async {
+    final selected = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2025),
+        builder: (context, child) {
+          return Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: const ColorScheme.light(
+                primary: Colors.lightBlue, // <-- SEE HERE
+                onPrimary: Colors.white, // <-- SEE HERE
+                onSurface: Colors.black, // <-- SEE HERE
+              ),
+              textButtonTheme: TextButtonThemeData(
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.black, // button text color
+                ),
+              ),
+            ),
+            child: child!,
+          );
+        });
+    if (selected != null && selected != selectedDate) {
+      setState(() {
+        selectedDate = selected;
+        date[widget.index] = getDate();
+      });
+    }
+    return selectedDate;
+  }
+
+// Select for Time
+  Future<TimeOfDay> _selectTime(BuildContext context) async {
+    final selected = await showTimePicker(
+      context: context,
+      initialTime: selectedTime,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Colors.lightBlue, // <-- SEE HERE
+              onPrimary: Colors.white, // <-- SEE HERE
+              onSurface: Colors.black, // <-- SEE HERE
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // button text color
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (selected != null && selected != selectedTime) {
+      setState(() {
+        selectedTime = selected;
+        time[widget.index] = getTime(selectedTime);
+      });
+    }
+    return selectedTime;
+  }
+
+  String getDate() {
+    // ignore: unnecessary_null_comparison
+    if (selectedDate == null) {
+      return 'select date';
+    } else {
+      return DateFormat('MMM d, yyyy').format(selectedDate);
+    }
+  }
+
+  String getTime(TimeOfDay tod) {
+    final now = DateTime.now();
+
+    final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
+    final format = DateFormat.jm();
+    return format.format(dt);
+  }
+
   TextEditingController nameController1 = TextEditingController();
   TextEditingController nameController2 = TextEditingController();
-  TextEditingController nameController3 = TextEditingController();
-  TextEditingController nameController4 = TextEditingController();
 
   void _edit(int index, int control) {
     setState(() {
@@ -227,12 +424,6 @@ class _SecondRoute extends State<SecondRoute> {
       } else if (control == 2) {
         details[index] = nameController2.text;
         nameController2.clear();
-      } else if (control == 3) {
-        date[index] = nameController3.text;
-        nameController3.clear();
-      } else if (control == 4) {
-        time[index] = nameController4.text;
-        nameController4.clear();
       }
     });
   }
@@ -240,79 +431,116 @@ class _SecondRoute extends State<SecondRoute> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 129, 9, 2),
+        backgroundColor: Colors.lightBlueAccent,
         appBar: AppBar(
           title: const Text("Changes"),
         ),
         body: SingleChildScrollView(
             child: Column(
           children: <Widget>[
+            Card(
+                color: Colors.white,
+                elevation: 10.0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0)),
+                child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(children: <Widget>[
+                      const Icon(
+                        Icons.list,
+                        color: Colors.black,
+                      ),
+                      Expanded(
+                          child: ListTile(
+                              title: Text(
+                                style: const TextStyle(
+                                    fontSize: 20,
+                                    color: Color.fromARGB(255, 0, 0, 0)),
+                                reminders.elementAt(widget.index),
+                              ),
+                              subtitle: Text(details.elementAt(widget.index)),
+                              trailing: const Icon(
+                                Icons.event,
+                                color: Colors.black,
+                              ))),
+                      Expanded(
+                          child: ListTile(
+                        title: Text(
+                          style: const TextStyle(
+                              fontSize: 18,
+                              color: Color.fromARGB(255, 0, 0, 0)),
+                          date.elementAt(widget.index),
+                        ),
+                        subtitle: Text(
+                          style: const TextStyle(
+                              fontSize: 18,
+                              color: Color.fromARGB(255, 0, 0, 0)),
+                          time.elementAt(widget.index),
+                        ),
+                      ))
+                    ]))),
             Padding(
-                padding: const EdgeInsets.all(20),
-                child: Text(
-                    style: const TextStyle(fontSize: 25, color: Colors.white),
-                    '${reminders.elementAt(widget.index)} : ${date.elementAt(widget.index)} : ${time.elementAt(widget.index)}')),
-            Padding(
-                padding: const EdgeInsets.all(20),
-                child: Text(
-                    style: const TextStyle(fontSize: 25, color: Colors.white),
-                    details.elementAt(widget.index))),
-            Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
               child: TextField(
                   controller: nameController1,
                   decoration: const InputDecoration(
-                    fillColor: Color.fromARGB(221, 255, 233, 233),
+                    fillColor: Colors.white,
                     filled: true,
                     border: OutlineInputBorder(),
                     labelText: 'Edit the name',
                   )),
             ),
-            ElevatedButton(
-                onPressed: () => _edit(widget.index, 1),
-                child: const Text('Press to Confirm Name Change')),
             Padding(
-              padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(50),
+                    ),
+                    onPressed: () => _edit(widget.index, 1),
+                    child: const Text('Press to Confirm Name Change'))),
+            Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20),
               child: TextField(
                   controller: nameController2,
                   decoration: const InputDecoration(
-                    fillColor: Color.fromARGB(221, 255, 233, 233),
+                    fillColor: Colors.white,
                     filled: true,
                     border: OutlineInputBorder(),
-                    labelText: 'Edit the Details of the thing',
+                    labelText: 'Press to edit the details ',
                   )),
             ),
-            ElevatedButton(
-                onPressed: () => _edit(widget.index, 2),
-                child: const Text('Press to Confirm Detail Change')),
+            Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(50),
+                    ),
+                    onPressed: () => _edit(widget.index, 2),
+                    child: const Text('Press to Detail Change'))),
+            Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(50),
+                ),
+                onPressed: () {
+                  _selectDate(context);
+                },
+                child: const Text('Press to Change Date'),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(20),
-              child: TextField(
-                  controller: nameController3,
-                  decoration: const InputDecoration(
-                    fillColor: Color.fromARGB(221, 255, 233, 233),
-                    filled: true,
-                    border: OutlineInputBorder(),
-                    labelText: 'Edit the date',
-                  )),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(50), // NEW
+                ),
+                onPressed: () {
+                  _selectTime(context);
+                },
+                child: const Text('Press to Change Time'),
+              ),
             ),
-            ElevatedButton(
-                onPressed: () => _edit(widget.index, 3),
-                child: const Text('Press to Confirm Date Change')),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: TextField(
-                  controller: nameController4,
-                  decoration: const InputDecoration(
-                    fillColor: Color.fromARGB(221, 255, 233, 233),
-                    filled: true,
-                    border: OutlineInputBorder(),
-                    labelText: 'Edit the time',
-                  )),
-            ),
-            ElevatedButton(
-                onPressed: () => _edit(widget.index, 4),
-                child: const Text('Press to Confirm Time Change')),
           ],
         )));
   }
