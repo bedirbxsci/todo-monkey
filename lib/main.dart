@@ -139,6 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _removeItem(int index) {
     setState(() {
       reminders.removeAt(index);
+      details.removeAt(index);
       date.removeAt(index);
       time.removeAt(index);
     });
@@ -184,37 +185,40 @@ class _MyHomePageState extends State<MyHomePage> {
                                         color: Colors.black,
                                       ),
                                       Expanded(
+                                        flex: 2,
                                           child: ListTile(
                                               title: Text(
                                                 style: const TextStyle(
-                                                    fontSize: 20,
+                                                    fontSize: 15,
                                                     color: Color.fromARGB(
                                                         255, 0, 0, 0)),
                                                 reminders.elementAt(index),
                                               ),
                                               subtitle: Text(
+                                                  style: const TextStyle(
+                                                      fontSize: 12),
                                                   details.elementAt(index)),
                                               trailing: const Icon(
                                                 Icons.event,
                                                 color: Colors.black,
                                               ))),
-                                      Expanded(
+                                      Flexible(
                                           child: ListTile(
-                                        title: Text(
-                                          style: const TextStyle(
-                                              fontSize: 18,
-                                              color:
-                                                  Color.fromARGB(255, 0, 0, 0)),
-                                          date.elementAt(index),
-                                        ),
-                                        subtitle: Text(
-                                          style: const TextStyle(
-                                              fontSize: 18,
-                                              color:
-                                                  Color.fromARGB(255, 0, 0, 0)),
-                                          time.elementAt(index),
-                                        ),
-                                      )),
+                                            title: Text(
+                                              style: const TextStyle(
+                                                  fontSize: 15,
+                                                  color: Color.fromARGB(
+                                                      255, 0, 0, 0)),
+                                              date.elementAt(index),
+                                            ),
+                                            subtitle: Text(
+                                              style: const TextStyle(
+                                                  fontSize: 15,
+                                                  color: Color.fromARGB(
+                                                      255, 0, 0, 0)),
+                                              time.elementAt(index),
+                                            ),
+                                          )),
                                       IconButton(
                                           onPressed: () => _removeItem(index),
                                           icon: const Icon(
